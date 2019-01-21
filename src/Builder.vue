@@ -10,16 +10,13 @@
           <input type="text" v-model='secret'>
         </div>
 
-      <h2>{{result}}</h2>
-
       </div>
 
       <div class='flex-right'>
         <div v-for="url in urls" class="qr-code" :key='url'>
-          <qrcode :value="url" size='200'/>
-          {{url}}
+          <qrcode :value="url" size='350'/>
         </div>
-          {{computedShares }}
+        <a @click='print' href="#" class='button no-print'>Print</a>
       </div>
     </div>
 </template>
@@ -38,29 +35,28 @@ export default {
     return {
       id: null,
       secret: null,
-      shares: 2,
+      shares: 3,
       threshold: 2,
     }
   },
   mounted() {
     this.id = hri.random()
   },
+  watch: {
+    secret() {
+      this.id = hri.random()
+    }
+  },
+  methods: {
+      print() {
+        window.print()
+      }
+  },
   computed: {
     computedShares () {
      if(!this.secret) return []
      return sss.split(this.secret, { shares: this.shares, threshold: this.threshold })
    },
-   result() {
-     let shares = this.computedShares.map((el) => {
-       let string = JSON.stringify(el)
-       var b64 = btoa(encodeURIComponent(string))
-       string = decodeURIComponent(atob(b64))
-       var uint8array = Buffer.from(JSON.parse(string).data)
-       return uint8array
-     })
-     const recovered = sss.combine(shares)
-     return recovered.toString()
-   }  ,
    encodedShares() {
       return this.computedShares.map((el) => {
          let string = JSON.stringify(el)
@@ -83,3 +79,20 @@ export default {
   }
 }
 </script>
+<style lang='scss'>
+@media print {
+  .no-print { display: none; }
+  .flex-left { display: none; }
+  .flex-right {
+    flex: none;
+    max-width: 100%;
+    width: 100%;
+  }
+  .qr-code {
+    display: inline;
+    div {
+      display: inline;
+    }
+  }
+}
+</style>

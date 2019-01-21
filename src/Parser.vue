@@ -1,10 +1,10 @@
 <template>
   <div class="">
-      <h1>parser {{id}}</h1>
-      <pre>
-        {{sharesArray}}
-      </pre>
-      result: {{result}}
+      <h1>Unlock {{id}}</h1>
+      <p>There are {{shares}} keys total, you have {{shareCount}} of
+      {{threshold}} required to unlock the secret.</p>
+
+      <div>{{result}}</div>
   </div>
 </template>
 
@@ -38,10 +38,6 @@ export default {
       const string = decodeURIComponent(atob(b64))
       var uint8array = Buffer.from(JSON.parse(string).data)
       return uint8array
-      // const decoded = decodeURIComponent(b64)
-      // const bString = decodeURIComponent(atob(decoded))
-      // const te = new TextEncoder
-      // return Buffer.from(te.encode(bString),'utf8');
     },
     reconcileShares() {
       let shares = null
@@ -57,13 +53,20 @@ export default {
     }
   },
   computed: {
+    shareCount() {
+      if(localStorage.getItem(this.id)) {
+        return localStorage.getItem(this.id).split(',').length
+      } else {
+          return 0
+        }
+
+    },
     encodedShares() {
       if(this.sharesArray.length < this.shares) return []
       return this.sharesArray.map((el) => this.extractShareFromBase64(el))
     },
     result() {
       if(this.encodedShares.length < this.shares) return null
-      console.log(this.encodedShares)
       const shares = this.encodedShares
       const recovered = sss.combine(shares)
       return recovered.toString()
