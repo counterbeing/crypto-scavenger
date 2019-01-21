@@ -10,12 +10,16 @@
           <input type="text" v-model='secret'>
         </div>
 
+      <h2>{{result}}</h2>
+
       </div>
 
       <div class='flex-right'>
         <div v-for="url in urls" class="qr-code" :key='url'>
           <qrcode :value="url" size='200'/>
+          {{url}}
         </div>
+          {{computedShares }}
       </div>
     </div>
 </template>
@@ -34,7 +38,7 @@ export default {
     return {
       id: null,
       secret: null,
-      shares: 3,
+      shares: 2,
       threshold: 2,
     }
   },
@@ -46,10 +50,21 @@ export default {
      if(!this.secret) return []
      return sss.split(this.secret, { shares: this.shares, threshold: this.threshold })
    },
+   result() {
+     let shares = this.computedShares.map((el) => {
+       let string = JSON.stringify(el)
+       var b64 = btoa(encodeURIComponent(string))
+       string = decodeURIComponent(atob(b64))
+       var uint8array = Buffer.from(JSON.parse(string).data)
+       return uint8array
+     })
+     const recovered = sss.combine(shares)
+     return recovered.toString()
+   }  ,
    encodedShares() {
       return this.computedShares.map((el) => {
-        const str = new TextDecoder("utf-8").decode(el)
-        return encodeURIComponent(btoa(unescape(encodeURIComponent(str))))
+         let string = JSON.stringify(el)
+         return btoa(encodeURIComponent(string))
       })
    },
    urls() {
@@ -59,9 +74,9 @@ export default {
         '#/parser/',
         '?',
         'id=', this.id,
-        'es=', es,
-        'th=', this.threshold,
-        'sh=', this.shares,
+        '&es=', es,
+        '&th=', this.threshold,
+        '&sh=', this.shares,
       ].join('')
      })
    }

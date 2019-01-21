@@ -1,7 +1,6 @@
 <template>
   <router-view/></template>
 <script>
-import Builder from './Builder'
 
 export default {
   name: 'app',
