@@ -62,12 +62,13 @@ export default {
 
     },
     encodedShares() {
-      if(this.sharesArray.length < this.shares) return []
+      if(this.sharesArray.length < this.threshold) return []
       return this.sharesArray.map((el) => this.extractShareFromBase64(el))
     },
     result() {
-      if(this.encodedShares.length < this.shares) return null
+      if(this.sharesArray.length < this.threshold) return null
       const shares = this.encodedShares
+      console.log(shares)
       const recovered = sss.combine(shares)
       return recovered.toString()
     }

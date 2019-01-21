@@ -15,6 +15,7 @@
       <div class='flex-right'>
         <div v-for="url in urls" class="qr-code" :key='url'>
           <qrcode :value="url" size='350'/>
+          <a :href='url' target="_new">Open</a>
         </div>
         <a @click='print' href="#" class='button no-print'>Print</a>
       </div>
